@@ -8,7 +8,7 @@ namespace UnityStandardAssets._2D
     public class Platformer2DUserControl : MonoBehaviour
     {
 		static int controller_count = 1;
-		int controller_id;
+		public int controller_id;
         private PlatformerCharacter2D m_Character;
         private bool m_Jump;
 
