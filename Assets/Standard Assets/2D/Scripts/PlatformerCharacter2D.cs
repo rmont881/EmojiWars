@@ -7,6 +7,7 @@ namespace UnityStandardAssets._2D
     {
         [SerializeField] private float m_MaxSpeed = 10f;                    // The fastest the player can travel in the x axis.
         [SerializeField] private float m_JumpForce = 400f;                  // Amount of force added when the player jumps.
+		[SerializeField] private float m_JumpForce_Max = 2600f;                  // Amount of force added when the player jumps.
         [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = .36f;  // Amount of maxSpeed applied to crouching movement. 1 = 100%
         [SerializeField] private bool m_AirControl = false;                 // Whether or not a player can steer while jumping;
         [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
@@ -19,6 +20,8 @@ namespace UnityStandardAssets._2D
         public Animator m_Anim;            // Reference to the player's animator component.
         private Rigidbody2D m_Rigidbody2D;
         private bool m_FacingRight = true;  // For determining which way the player is currently facing.
+		private bool m_HitMaxForce = false; // Set when max force is reached.
+		private float m_ForceApplied = 0.0f;// Amount of force applied during jump.
 
         private void Awake()
         {
@@ -95,8 +98,22 @@ namespace UnityStandardAssets._2D
                 // Add a vertical force to the player.
                 m_Grounded = false;
                 m_Anim.SetBool("Ground", false);
-                m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
+                //m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
             }
+			//Adding additional force if the jump key is being held.
+			if (jump && !m_HitMaxForce) {
+				m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
+				m_ForceApplied = m_ForceApplied + m_JumpForce;
+				if (m_ForceApplied >= m_JumpForce_Max) {
+					m_HitMaxForce = true;
+//					print ("Max force hit.");
+				}
+			}
+			if (m_Grounded) {
+				m_HitMaxForce = false;
+				m_ForceApplied = 0.0f;
+//				print ("Max force reset.");
+			}
         }
 
 
