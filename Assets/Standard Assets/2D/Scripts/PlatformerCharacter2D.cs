@@ -22,6 +22,8 @@ namespace UnityStandardAssets._2D
         private bool m_FacingRight = true;  // For determining which way the player is currently facing.
 		private bool m_HitMaxForce = false; // Set when max force is reached.
 		private float m_ForceApplied = 0.0f;// Amount of force applied during jump.
+		private float m_ForceOffset = 0.0f;
+		private float m_InitialOffset = 0.0f;
 
         private void Awake()
         {
@@ -95,15 +97,20 @@ namespace UnityStandardAssets._2D
             // If the player should jump...
             if (m_Grounded && jump && m_Anim.GetBool("Ground"))
             {
-                // Add a vertical force to the player.
                 m_Grounded = false;
                 m_Anim.SetBool("Ground", false);
-                //m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
+				m_InitialOffset = 200.0f;
             }
 			//Adding additional force if the jump key is being held.
 			if (jump && !m_HitMaxForce) {
-				m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
-				m_ForceApplied = m_ForceApplied + m_JumpForce;
+				m_ForceOffset = Time.deltaTime * 15;
+				if (m_InitialOffset != 0.0f) {
+					m_ForceOffset = m_ForceOffset + 0.4f;
+					m_InitialOffset = m_InitialOffset - 0.1f;
+				}
+				m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce * m_ForceOffset));
+				print ("Delta Time: " + m_ForceOffset);
+				m_ForceApplied = m_ForceApplied + (m_JumpForce * m_ForceOffset);
 				if (m_ForceApplied >= m_JumpForce_Max) {
 					m_HitMaxForce = true;
 //					print ("Max force hit.");
